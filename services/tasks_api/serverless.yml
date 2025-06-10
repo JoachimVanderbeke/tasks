@@ -1,0 +1,38 @@
+service: tasks-api
+
+frameworkVersion: '3'
+useDotenv: true  # you're able to load environment variables from .env files like .env and .env.development. You can use those variables within serverless.yml -- .e.g, ${env:ALLOWED_ORIGINS} below
+
+# In the case of AWS, Serverless Framework translates the configuration written in the serverless.yml file to CloudFormation templates, which are then used to provision cloud resources.
+provider:
+  name: aws
+  runtime: python3.9
+  region: ${opt:region, 'eu-west-1'}  # if you want to set on cli: serverless deploy --region us-east-1 --stage production
+  stage: ${opt:stage, 'development'}
+  logRetentionInDays: 5
+  environment:
+    APP_ENVIRONMENT: ${self:provider.stage}  #  one global environment variable, APP_ENVIRONMENT, which will be set for all Lambda functions.
+
+functions:
+  API:
+    handler: main.handle  # jvdb: main.py is the entry point, handle is the function to call
+    timeout: 10
+    memorySize: 512
+    events:
+      - http:  # jvdb: We also defined how our Lambda function will be invoked. By specifying HTTP event, we told Serverless Framework that it will be invoked via API Gateway. Magnum provides a proxy between the API Gateway event sent to the Lambda and our FastAPI application.
+          path: /{proxy+}  #  all traffic, regardless of the path, will end up being sent to our Lambda function.
+          method: any
+          cors:
+            origin: ${env:ALLOWED_ORIGINS}
+            maxAge: 60
+
+
+custom:
+  pythonRequirements:
+    usePoetry: true
+    noDeploy:
+      - boto3  # already on Lambda
+      - botocore  # already on Lambda
+
+plugins:
+  - serverless-python-requirements
