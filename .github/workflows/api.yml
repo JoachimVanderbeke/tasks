@@ -78,7 +78,7 @@ jobs:
       matrix:
         python-version: [3.9]
         poetry-version: [2.1.3]
-        node-version: [24]
+        node-version: ['>=21.2']
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     defaults:
@@ -86,7 +86,7 @@ jobs:
         working-directory: services/tasks_api
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Python 3.9
         uses: actions/setup-python@v3
         with:
@@ -95,9 +95,11 @@ jobs:
         uses: abatilo/actions-poetry@v2.0.0
         with:
           poetry-version: ${{ matrix.poetry-version }}
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+          check-latest: true
+          cache: npm
       - name: Install Serverless Framework
         run: npm install -g serverless
       - name: Install NPM dependencies  #  installed dependencies from package.json
