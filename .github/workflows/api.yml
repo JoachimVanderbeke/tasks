@@ -106,7 +106,7 @@ jobs:
       - name: Clear NPM Cache
         run: npm cache clean --force
       - name: Install Serverless Framework
-        run: npm install -g serverless
+        run: npm install -g serverless@v4
       - name: Install NPM dependencies  #  installed dependencies from package.json
         run: npm install
       - name: Deploy
