@@ -1,6 +1,6 @@
 service: tasks-api
 
-frameworkVersion: '3'
+frameworkVersion: '4'
 useDotenv: true  # you're able to load environment variables from .env files like .env and .env.development. You can use those variables within serverless.yml -- .e.g, ${env:ALLOWED_ORIGINS} below
 
 # In the case of AWS, Serverless Framework translates the configuration written in the serverless.yml file to CloudFormation templates, which are then used to provision cloud resources.
