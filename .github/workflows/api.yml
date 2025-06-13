@@ -78,7 +78,7 @@ jobs:
       matrix:
         python-version: [ 3.9 ]
         poetry-version: [ 2.1.3 ]
-        node-version: [ 21.x ]  # Updated to a valid Node.js version
+        node-version: [ 20.x ]  # Use a stable LTS version
         os: [ ubuntu-latest ]
     runs-on: ${{ matrix.os }}
     defaults:
@@ -95,15 +95,19 @@ jobs:
         uses: abatilo/actions-poetry@v2.0.0
         with:
           poetry-version: ${{ matrix.poetry-version }}
-      - uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           check-latest: true
           cache: npm
+      - name: Debug Node.js Version
+        run: node --version  # Print Node.js version
+      - name: Clear NPM Cache
+        run: npm cache clean --force
       - name: Install Serverless Framework
         run: npm install -g serverless
       - name: Install NPM dependencies  #  installed dependencies from package.json
         run: npm install
       - name: Deploy
         run: sls deploy --stage development --verbose
-
