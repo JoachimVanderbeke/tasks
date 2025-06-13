@@ -71,15 +71,15 @@ jobs:
         run: poetry run flake8 .
       - name: Run bandit
         run: poetry run bandit .
-  deploy-development:  # new
+  deploy-development:
     needs: [ test, code-quality ]
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9]
-        poetry-version: [2.1.3]
-        node-version: ['>=21.2']
-        os: [ubuntu-latest]
+        python-version: [ 3.9 ]
+        poetry-version: [ 2.1.3 ]
+        node-version: [ 21.x ]  # Updated to a valid Node.js version
+        os: [ ubuntu-latest ]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
