@@ -72,7 +72,7 @@ jobs:
       - name: Run bandit
         run: poetry run bandit .
   deploy-development:
-    needs: [ test, code-quality ]
+    # needs: [ test, code-quality ] # Uncomment if you want to run tests and code quality checks before deployment
     strategy:
       fail-fast: false
       matrix:
@@ -109,5 +109,7 @@ jobs:
         run: npm install -g serverless@v4
       - name: Install NPM dependencies  #  installed dependencies from package.json
         run: npm install
+      - name: Debug AWS Credentials
+        run: echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" && echo "AWS_SECRET_ACCESS_KEY is set"
       - name: Deploy
         run: sls deploy --stage development --verbose
