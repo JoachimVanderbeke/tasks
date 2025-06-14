@@ -197,3 +197,5 @@ cython_debug/
 
 # serverless related stuff
 .serverless
+
+node_modules/
