@@ -12,6 +12,8 @@ app.add_middleware(
 )
 
 
+# poetry run uvicorn main:app --reload
+# navigate to http://127.0.0.1:8000/api/health-check/
 @app.get("/api/health-check/")
 def health_check():
     return {"message": "OK"}
