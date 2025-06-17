@@ -3,7 +3,9 @@ import uuid  # new
 import boto3  # new
 import pytest
 from fastapi import status
-from moto import mock_aws  # new; in our tests, we'll use Moto to prevent calls to the real DynamoDB API. That will keep our tests fast and repeatable.
+from moto import (
+    mock_aws,
+)  # new; in our tests, we'll use Moto to prevent calls to the real DynamoDB API. That will keep our tests fast and repeatable.
 from starlette.testclient import TestClient
 
 from main import app
@@ -47,19 +49,13 @@ def dynamodb_table():
             BillingMode="PAY_PER_REQUEST",
             GlobalSecondaryIndexes=[
                 {
-                    'IndexName': 'GS1',  # global secondary index
-                    'KeySchema': [
-                        {
-                            'AttributeName': 'GS1PK',
-                            'KeyType': 'HASH'
-                        },
-                        {
-                            'AttributeName': 'GS1SK',
-                            'KeyType': 'RANGE'
-                        },
+                    "IndexName": "GS1",  # global secondary index
+                    "KeySchema": [
+                        {"AttributeName": "GS1PK", "KeyType": "HASH"},
+                        {"AttributeName": "GS1SK", "KeyType": "RANGE"},
                     ],
-                    'Projection': {
-                        'ProjectionType': 'ALL',
+                    "Projection": {
+                        "ProjectionType": "ALL",
                     },
                 },
             ],
@@ -79,7 +75,9 @@ def test_added_task_retrieved_by_id(dynamodb_table):
 def test_open_tasks_listed(dynamodb_table):
     repository = TaskStore(table_name=dynamodb_table)
     open_task = Task.create(uuid.uuid4(), "Clean your office", "john@doe.com")
-    closed_task = Task(uuid.uuid4(), "Clean your office", TaskStatus.CLOSED, "john@doe.com")
+    closed_task = Task(
+        uuid.uuid4(), "Clean your office", TaskStatus.CLOSED, "john@doe.com"
+    )
 
     repository.add(open_task)
     repository.add(closed_task)
@@ -90,10 +88,11 @@ def test_open_tasks_listed(dynamodb_table):
 def test_closed_tasks_listed(dynamodb_table):
     repository = TaskStore(table_name=dynamodb_table)
     open_task = Task.create(uuid.uuid4(), "Clean your office", "john@doe.com")
-    closed_task = Task(uuid.uuid4(), "Clean your office", TaskStatus.CLOSED, "john@doe.com")
+    closed_task = Task(
+        uuid.uuid4(), "Clean your office", TaskStatus.CLOSED, "john@doe.com"
+    )
 
     repository.add(open_task)
     repository.add(closed_task)
 
     assert repository.list_closed(owner=open_task.owner) == [closed_task]
-

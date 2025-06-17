@@ -80,5 +80,3 @@ class TaskStore:
             if last_key is None:
                 break
         return tasks
-
-
