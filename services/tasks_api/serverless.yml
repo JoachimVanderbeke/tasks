@@ -32,17 +32,23 @@ provider:
 
 functions:
   API:
-    handler: main.handle  # jvdb: main.py is the entry point, handle is the function to call
+    handler: main.handle
     timeout: 10
     memorySize: 512
     events:
-      - http:  # jvdb: We also defined how our Lambda function will be invoked. By specifying HTTP event, we told Serverless Framework that it will be invoked via API Gateway. Magnum provides a proxy between the API Gateway event sent to the Lambda and our FastAPI application.
-          path: /{proxy+}  #  all traffic, regardless of the path, will end up being sent to our Lambda function.
+      - http:
+          path: /{proxy+}
           method: any
           cors:
             origin: ${env:ALLOWED_ORIGINS}
             maxAge: 60
-
+          authorizer:  # new
+            name: TasksAPIAuthorizer  # new
+            type: COGNITO_USER_POOLS  # new
+            arn:  # new
+              Fn::GetAtt:  # new
+                - CognitoUserPool  # new
+                - Arn  # new
 
 custom:
   pythonRequirements:
