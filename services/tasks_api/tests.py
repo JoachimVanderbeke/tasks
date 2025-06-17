@@ -4,8 +4,8 @@
 import uuid  # new
 
 import boto3  # new
-import pytest
 import jwt  # new
+import pytest
 from fastapi import status
 from moto import mock_aws
 from starlette.testclient import TestClient

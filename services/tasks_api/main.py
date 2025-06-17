@@ -9,7 +9,7 @@ from starlette import status  # new
 
 from config import Config  # new
 from models import Task  # new
-from schemas import APITask, CreateTask, APITaskList, CloseTask  # new
+from schemas import APITask, APITaskList, CloseTask, CreateTask  # new
 from store import TaskStore  # new
 
 app = FastAPI()
