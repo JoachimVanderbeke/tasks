@@ -34,7 +34,8 @@ def get_user_email(authorization: Union[str, None] = Header(default=None)) -> st
         "cognito:username"
     ]
 
-
+### in order to run the app locally with the dynamodb table, use the steps in create_dynamodb_table.py.
+### steps below are older version of the app.
 # poetry run uvicorn main:app --reload
 # navigate to http://127.0.0.1:8000/api/health-check/
 # on aws:
@@ -59,9 +60,10 @@ def create_task(
     user_email: str = Depends(get_user_email),
     task_store: TaskStore = Depends(get_task_store),
 ):
-    # todo: shouldn't this create APITask instead of Task?
+    # todo: shouldn't this create APITask instead of Task? this is now different than the original code
     task = Task.create(id_=uuid.uuid4(), title=parameters.title, owner=user_email)
     task_store.add(task)
+    # return task  # testdrivenio version
     return APITask(
         id=task.id,
         title=task.title,
