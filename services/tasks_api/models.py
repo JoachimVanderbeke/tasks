@@ -21,4 +21,3 @@ class Task:
 
     def close(self):  # new
         self.status = TaskStatus.CLOSED  # new
-

@@ -41,7 +41,6 @@ def id_token(user_email):
     return jwt.encode({"cognito:username": user_email}, "secret")
 
 
-
 def test_health_check(client):
     """
     GIVEN
@@ -125,13 +124,7 @@ def test_closed_tasks_listed(dynamodb_table):
 def test_create_task(client, user_email, id_token):
     title = "Clean your desk"
     response = client.post(
-        "/api/create-task",
-        json={
-            "title": title
-        },
-        headers={
-            "Authorization": id_token
-        }
+        "/api/create-task", json={"title": title}, headers={"Authorization": id_token}
     )
     body = response.json()
 
@@ -148,10 +141,7 @@ def test_list_open_tasks(client, user_email, id_token):
         "/api/create-task", json={"title": title}, headers={"Authorization": id_token}
     )
 
-    response = client.get(
-        "/api/open-tasks",
-        headers={"Authorization": id_token}
-    )
+    response = client.get("/api/open-tasks", headers={"Authorization": id_token})
     body = response.json()
 
     assert response.status_code == status.HTTP_200_OK
@@ -192,10 +182,7 @@ def test_list_closed_tasks(client, user_email, id_token):
         headers={"Authorization": id_token},
     )
 
-    response = client.get(
-        "/api/closed-tasks",
-        headers={"Authorization": id_token}
-    )
+    response = client.get("/api/closed-tasks", headers={"Authorization": id_token})
     body = response.json()
 
     assert response.status_code == status.HTTP_200_OK
