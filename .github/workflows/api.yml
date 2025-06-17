@@ -95,6 +95,8 @@ jobs:
         uses: abatilo/actions-poetry@v2.0.0
         with:
           poetry-version: ${{ matrix.poetry-version }}
+      - name: Install poetry-plugin-export
+        run: poetry self add poetry-plugin-export
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
