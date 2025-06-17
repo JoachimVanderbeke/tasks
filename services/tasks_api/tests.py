@@ -1,4 +1,5 @@
-# new; in our tests, we'll use Moto to prevent calls to the real DynamoDB API. That will keep our tests fast and repeatable.
+# in our tests, we'll use Moto to prevent calls to the real DynamoDB API.
+# That will keep our tests fast and repeatable.
 
 import uuid  # new
 

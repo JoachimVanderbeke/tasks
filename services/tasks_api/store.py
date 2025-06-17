@@ -16,9 +16,10 @@ class TaskStore:
         table = dynamodb.Table(self.table_name)
         table.put_item(
             Item={
-                # Table PK and SK cannot be changed. That's not true for Index PK (GS1PK) and SK (GS1SK). We can change the value of them.
-                # Therefore, use static data for Table PK/SK (e.g., ID, owner, created_at, ...) and use Index PK/SK for dynamic/mutable data
-                # (e.g., status, updated_at, last_access_at, ...).
+                # Table PK and SK cannot be changed. That's not true for Index PK (GS1PK) and SK (GS1SK).
+                # We can change the value of them.
+                # Therefore, use static data for Table PK/SK (e.g., ID, owner, created_at, ...)
+                # and use Index PK/SK for dynamic/mutable data (e.g., status, updated_at, last_access_at, ...).
                 "PK": f"#{task.owner}",  # PK
                 "SK": f"#{task.id}",
                 "GS1PK": f"#{task.owner}#{task.status.value}",  # add GSI to enable querying by status
