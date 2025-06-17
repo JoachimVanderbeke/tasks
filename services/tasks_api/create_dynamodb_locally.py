@@ -1,4 +1,5 @@
 import os
+
 import boto3
 
 # Use this script to create the DynamoDB table locally:
