@@ -72,7 +72,7 @@ jobs:
       - name: Run bandit
         run: poetry run bandit .
   deploy-development:
-    # needs: [ test, code-quality ] # Uncomment if you want to run tests and code quality checks before deployment
+    needs: [ test, code-quality ] # Uncomment if you want to run tests and code quality checks before deployment
     strategy:
       fail-fast: false
       matrix:
