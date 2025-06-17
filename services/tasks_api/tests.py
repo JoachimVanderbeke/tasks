@@ -3,8 +3,8 @@ import uuid  # new
 import boto3  # new
 import pytest
 from fastapi import status
-from moto import \
-    mock_aws  # new; in our tests, we'll use Moto to prevent calls to the real DynamoDB API. That will keep our tests fast and repeatable.
+# new; in our tests, we'll use Moto to prevent calls to the real DynamoDB API. That will keep our tests fast and repeatable.
+from moto import mock_aws
 from starlette.testclient import TestClient
 
 from main import app
