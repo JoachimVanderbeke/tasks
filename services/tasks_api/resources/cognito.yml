@@ -1,0 +1,34 @@
+#With this file, we defined the Cognito resources that need to be created for our application:
+#
+#The first one is a user pool, which you can think of as a users table. When a new user is created, it gets added to the user pool.
+#In order to authenticate from web applications, we also need a Cognito client. A client allows for different forms of authentication. We configured it in a way to support email + password.
+#We'll need the user pool's ID for our API Gateway authorizer. We'll also need the IDs from the user pool and client to connect to them from our Vue application.
+#
+#As everything else Serverless related, this file will be translated into the appropriate CloudFormation template and applied to our application's stack.
+
+Resources:
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: ${self:provider.stage}-tasks-api-pool
+      AutoVerifiedAttributes:
+        - email
+
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: ${self:provider.stage}-tasks-api-client
+      UserPoolId:
+        Ref: CognitoUserPool
+      ExplicitAuthFlows:
+        - ADMIN_NO_SRP_AUTH
+      GenerateSecret: false
+
+Outputs:
+  UserPoolId:
+    Value:
+      Ref: CognitoUserPool
+
+  UserPoolClientId:
+    Value:
+      Ref: CognitoUserPoolClient
