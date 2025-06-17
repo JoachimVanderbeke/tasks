@@ -13,6 +13,22 @@ provider:
   logRetentionInDays: 5
   environment:
     APP_ENVIRONMENT: ${self:provider.stage}  #  one global environment variable, APP_ENVIRONMENT, which will be set for all Lambda functions.
+  iam:  # so that our application running on a Lambda function can access the DynamoDB table
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          # Allow only access to the API's table and its indexes
+          Resource:
+            - "Fn::GetAtt": [ TasksAPITable, Arn ]  # see cloudformation docs for Fn::GetAtt and Fn::Join info. TasksAPITable as in dynamodb.yml
+            - "Fn::Join": ['/', ["Fn::GetAtt": [ TasksAPITable, Arn ], 'index', '*']]
 
 functions:
   API:
@@ -34,6 +50,11 @@ custom:
     noDeploy:
       - boto3  # already on Lambda
       - botocore  # already on Lambda
+  stage: ${opt:stage, self:provider.stage}  # new
+  tableName: ${self:custom.stage}-tasks-api  # new
 
 plugins:
   - serverless-python-requirements
+
+resources:
+  - ${file(resources/dynamodb.yml)}  # new
