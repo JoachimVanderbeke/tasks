@@ -3,7 +3,8 @@ import os
 import boto3
 
 # Use this script to create the DynamoDB table locally:
-# $ export AWS_ACCESS_KEY_ID=abc && export AWS_SECRET_ACCESS_KEY=abc && export AWS_DEFAULT_REGION=eu-west-1 && export TABLE_NAME="local-tasks-api-table" && export DYNAMODB_URL=http://localhost:9999
+# $ export AWS_ACCESS_KEY_ID=abc && export AWS_SECRET_ACCESS_KEY=abc && export AWS_DEFAULT_REGION=eu-west-1 \
+# && export TABLE_NAME="local-tasks-api-table" && export DYNAMODB_URL=http://localhost:9999
 # powershell:
 # $env:AWS_ACCESS_KEY_ID="abc"
 # $env:AWS_SECRET_ACCESS_KEY="abc"
@@ -19,7 +20,8 @@ import boto3
 # is to set credentials to some non-None value, which is exactly what we did above.
 
 # Now, set the following environment variables and run the server:
-# $ export AWS_ACCESS_KEY_ID=abc && export AWS_SECRET_ACCESS_KEY=abc && export AWS_DEFAULT_REGION=eu-west-1 && export TABLE_NAME="local-tasks-api-table" && export DYNAMODB_URL=http://localhost:9999
+# $ export AWS_ACCESS_KEY_ID=abc && export AWS_SECRET_ACCESS_KEY=abc && export AWS_DEFAULT_REGION=eu-west-1 \
+# && export TABLE_NAME="local-tasks-api-table" && export DYNAMODB_URL=http://localhost:9999
 # powershell:
 # $env:AWS_ACCESS_KEY_ID="abc"
 # $env:AWS_SECRET_ACCESS_KEY="abc"
@@ -29,14 +31,14 @@ import boto3
 # $ poetry run uvicorn main:app --reload
 
 # to create a task:
-# curl --location --request POST 'http://localhost:8000/api/create-task' --header 'Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2duaXRvOnVzZXJuYW1lIjoiam9obkBkb2UuY29tIn0.6UvNP3lIrXAinXYqH4WzyNrYCxUFIRhAluWyAxcCoUc' --header 'Content-Type: application/json' --data-raw '{"title": "Jump"}'
+# curl --location --request POST 'http://localhost:8000/api/create-task' --header 'Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2duaXRvOnVzZXJuYW1lIjoiam9obkBkb2UuY29tIn0.6UvNP3lIrXAinXYqH4WzyNrYCxUFIRhAluWyAxcCoUc' --header 'Content-Type: application/json' --data-raw '{"title": "Jump"}'  # noqa
 # Note: token above contains
 # {
 #   "cognito:username": "john@doe.com"
 # }
 
 # list open tasks:
-# curl --location --request GET 'http://localhost:8000/api/open-tasks' --header 'Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2duaXRvOnVzZXJuYW1lIjoiam9obkBkb2UuY29tIn0.6UvNP3lIrXAinXYqH4WzyNrYCxUFIRhAluWyAxcCoUc'
+# curl --location --request GET 'http://localhost:8000/api/open-tasks' --header 'Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2duaXRvOnVzZXJuYW1lIjoiam9obkBkb2UuY29tIn0.6UvNP3lIrXAinXYqH4WzyNrYCxUFIRhAluWyAxcCoUc'  # noqa
 
 # as in dynamodb_table fixture in tests.py
 client = boto3.client("dynamodb", endpoint_url=os.getenv("DYNAMODB_URL"))

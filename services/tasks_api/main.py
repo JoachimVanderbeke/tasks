@@ -35,8 +35,8 @@ def get_user_email(authorization: Union[str, None] = Header(default=None)) -> st
     ]
 
 
-### in order to run the app locally with the dynamodb table, use the steps in create_dynamodb_table.py.
-### steps below are older version of the app.
+# -- in order to run the app locally with the dynamodb table, use the steps in create_dynamodb_table.py.
+# -- steps below are older version of the app.
 # poetry run uvicorn main:app --reload
 # navigate to http://127.0.0.1:8000/api/health-check/
 # on aws:
