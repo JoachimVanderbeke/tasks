@@ -14,6 +14,10 @@ class TaskStore:
     def add(self, task):
         dynamodb = boto3.resource("dynamodb")
         table = dynamodb.Table(self.table_name)
+        try:
+            utc_now = datetime.datetime.utcnow()
+        except AttributeError:
+            utc_now = datetime.datetime.now(datetime.timezone.utc)
         table.put_item(
             Item={
                 # Table PK and SK cannot be changed. That's not true for Index PK (GS1PK) and SK (GS1SK).
@@ -23,7 +27,7 @@ class TaskStore:
                 "PK": f"#{task.owner}",  # PK
                 "SK": f"#{task.id}",
                 "GS1PK": f"#{task.owner}#{task.status.value}",  # add GSI to enable querying by status
-                "GS1SK": f"#{datetime.datetime.now(datetime.UTC).isoformat()}",
+                "GS1SK": f"#{utc_now.isoformat()}",
                 "id": str(task.id),
                 "title": task.title,
                 "status": task.status.value,
