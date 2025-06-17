@@ -12,7 +12,9 @@ provider:
   stage: ${opt:stage, 'development'}
   logRetentionInDays: 5
   environment:
-    APP_ENVIRONMENT: ${self:provider.stage}  #  one global environment variable, APP_ENVIRONMENT, which will be set for all Lambda functions.
+    # global environment variables that will be set for all Lambda functions
+    APP_ENVIRONMENT: ${self:provider.stage}
+    TABLE_NAME: ${self:custom.tableName}
   iam:  # so that our application running on a Lambda function can access the DynamoDB table
     role:
       statements:
