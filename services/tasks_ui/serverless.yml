@@ -17,8 +17,8 @@ plugins:
 
 custom:
   stage: ${opt:stage, self:provider.stage}
-  bucketName: ${self:custom.stage}-tasks-api
-  #  bucketName: ${self:custom.stage}-tasks-api-joachim-1234
+  #  bucketName: ${self:custom.stage}-tasks-api
+  bucketName: ${self:custom.stage}-tasks-api-joachim-1234
   s3Sync:
     # A simple configuration for copying static assets
     # S3 Sync: used for deploying Single-page Applications -- or any other static assets, for that matter -- to an S3 bucket
