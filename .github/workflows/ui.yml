@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18.20.8]
+        node-version: [18.x]
     defaults:
       run:
         working-directory: services/tasks_ui
