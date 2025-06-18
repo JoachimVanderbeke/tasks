@@ -1,0 +1,69 @@
+service: tasks-ui
+
+frameworkVersion: '3'
+useDotenv: true
+
+
+provider:
+  name: aws
+  region: ${opt:region, 'eu-west-1'}
+  stage: ${opt:stage, 'development'}
+
+
+
+plugins:
+  - serverless-s3-sync
+
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  bucketName: ${self:custom.stage}-tasks-api
+  s3Sync:
+    # A simple configuration for copying static assets
+    - # S3 Sync: used for deploying Single-page Applications -- or any other static assets, for that matter -- to an S3 bucket
+    - bucketName: ${self:custom.bucketName}
+      localDir: dist
+
+
+resources:
+  Resources:
+    TasksAPIBucket:
+      # our deployed static files (HTML, CSS, and JavaScript files) will live there
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucketName}
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+        OwnershipControls:
+          Rules:
+            - ObjectOwnership: ObjectWriter
+        WebsiteConfiguration:
+          IndexDocument: index.html
+          ErrorDocument: error.html
+    TasksAPIBucketPolicy:
+      # our permission policy that allows access to S3 to anyone, so we can serve our application to the Internet
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref TasksAPIBucket
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Sid: "PublicReadGetObject"
+              Effect: "Allow"
+              Principal: "*"
+              Action: "s3:GetObject"
+              Resource:
+                Fn::Join:
+                  - ""
+                  - - "arn:aws:s3:::"
+                    - !Ref TasksAPIBucket
+                    - "/*"
+  Outputs:
+    TasksAPIBucketName:
+      Value: !Ref TasksAPIBucket
+      Export:
+        Name: s3-${self:custom.bucketName}-name
+    TasksAPIBucketArn:
+      Value: !GetAtt TasksAPIBucket.Arn
+      Export:
+        Name: s3-${self:custom.bucketName}-arn

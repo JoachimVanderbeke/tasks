@@ -2,7 +2,7 @@ name: API Test and deploy
 on:
   push:
     paths:
-      - 'services/tasks_api/**'
+      - 'services/tasks_api/**'   # so the CI pipeline only runs when changes to these files are made
       - '.github/workflows/api.yml'
 
 
