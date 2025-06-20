@@ -139,7 +139,8 @@ Resources:
                       -
                         - 'origin-access-identity/cloudfront/'
                         - Ref: CloudFrontOriginAccessIdentity
-          - DomainName: https://z44usazbjk.execute-api.eu-west-1.amazonaws.com/development/api
+#          - DomainName: https://z44usazbjk.execute-api.eu-west-1.amazonaws.com/development/api  # old?
+          - DomainName: https://o5v7570sh0.execute-api.eu-west-1.amazonaws.com/development/api
             Id: api
             OriginPath: /development
             CustomOriginConfig:
