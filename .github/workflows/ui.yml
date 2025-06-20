@@ -3,7 +3,7 @@ on:
   push:
     paths:
       - 'services/tasks_ui/**'
-      - '.github/workflows/ui.yml'
+      - '.github/workflows/ui.yml'  # trigger pipeline
 
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

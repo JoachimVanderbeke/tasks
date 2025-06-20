@@ -3,7 +3,7 @@ on:
   push:
     paths:
       - 'services/tasks_api/**'   # so the CI pipeline only runs when changes to these files are made
-      - '.github/workflows/api.yml'
+      - '.github/workflows/api.yml'  # trigger pipeline
 
 
 env:  # new
