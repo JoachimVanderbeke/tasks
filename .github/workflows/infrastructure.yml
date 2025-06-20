@@ -22,5 +22,4 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Apply changes
-        run: echo "Applying infrastructure changes..."
-#        run:  aws cloudformation deploy --template-file cf_tasks.yml --stack-name ${APP_ENVIRONMENT}-tasks --parameter-overrides Domain=${APP_DOMAIN}
+        run:  aws cloudformation deploy --template-file cf_tasks.yml --stack-name ${APP_ENVIRONMENT}-tasks   # --parameter-overrides Domain=${APP_DOMAIN}
