@@ -7,127 +7,175 @@ Parameters:
     AllowedPattern: "(?!-)[a-zA-Z0-9-.]{1,63}(?<!-)"
     ConstraintDescription: must be a valid DNS zone name.
 Resources:
-  TasksHostedZone:
-    Type: AWS::Route53::HostedZone
+  CloudWatchAutoAlarmsSNSTopic:
+    Type: AWS::SNS::Topic
     Properties:
-      HostedZoneConfig:
-        HostedZoneConfig
-      Name:
-        Ref: Domain
-  CloudFrontOriginAccessIdentity:  # new
-      Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
-      Properties:
-        CloudFrontOriginAccessIdentityConfig:
-          Comment: "Tasks UI"
-  VueAppS3Policy:  # new
-    Type: AWS::S3::BucketPolicy
+      DisplayName: CloudWatchAutoAlarms SNS Notification Topic
+      TopicName: CloudWatchAutoAlarmsSNSTopic
+  CloudWatchAutoAlarmsSNSTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
     Properties:
-      Bucket:
-        Fn::ImportValue: s3-development-tasks-api-name
+      Topics:
+        - !Ref CloudWatchAutoAlarmsSNSTopic
       PolicyDocument:
-        Version: "2012-10-17"
+        Version: '2012-10-17'
+        Id: SSEAndSSLPolicy
         Statement:
-          - Effect: Allow
+          - Sid: Allow_Publish_Alarms
+            Effect: Allow
             Principal:
-              CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
-            Action: "s3:GetObject"
+              Service:
+                - cloudwatch.amazonaws.com
+            Action: sns:Publish
             Resource:
-              Fn::Join:
-                - '/'
-                - - Fn::ImportValue: s3-development-tasks-api-arn
-                  - '*'
-  APICachePolicy:  # new
-    Type: AWS::CloudFront::CachePolicy
+              - !Join
+                - ':'
+                - - 'arn'
+                  - !Ref AWS::Partition
+                  - 'sns'
+                  - !Ref AWS::Region
+                  - !Ref AWS::AccountId
+                  - !GetAtt CloudWatchAutoAlarmsSNSTopic.TopicName
+  EmailSNSSubscription:
+    Type: AWS::SNS::Subscription
     Properties:
-      CachePolicyConfig:
-        DefaultTTL: 0
-        MaxTTL: 1
-        MinTTL: 0
-        Name: APICachePolicy
-        ParametersInCacheKeyAndForwardedToOrigin:
-          CookiesConfig:
-            CookieBehavior: all
-          EnableAcceptEncodingGzip: true
-          HeadersConfig:
-            HeaderBehavior: whitelist
-            Headers:
-              - Authorization
-              - Content-Type
-          QueryStringsConfig:
-            QueryStringBehavior: none
-  VueAppCachePolicy:  # new
-    Type: AWS::CloudFront::CachePolicy
+      Endpoint: joachimvanderbeke@gmail.com
+      Protocol: email
+      TopicArn: !Ref CloudWatchAutoAlarmsSNSTopic
+  TooManyErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
     Properties:
-      CachePolicyConfig:
-        DefaultTTL: 30
-        MaxTTL: 60
-        MinTTL: 0
-        Name: VueAppCachePolicy
-        ParametersInCacheKeyAndForwardedToOrigin:
-          CookiesConfig:
-            CookieBehavior: all
-          EnableAcceptEncodingGzip: true
-          HeadersConfig:
-            HeaderBehavior: whitelist
-            Headers:
-              - Content-Type
-          QueryStringsConfig:
-            QueryStringBehavior: none
-  TasksCloudFront:  # new
-    Type: AWS::CloudFront::Distribution
-    Properties:
-      DistributionConfig:
-        Origins:
-          - DomainName:
-              Fn::Join:
-                - '.'
-                - - Fn::ImportValue: s3-development-tasks-api-name
-                  - 's3.amazonaws.com'
-            Id: vueApp
-            S3OriginConfig:
-              OriginAccessIdentity:
-                  Fn::Join:
-                      - ''
-                      -
-                        - 'origin-access-identity/cloudfront/'
-                        - Ref: CloudFrontOriginAccessIdentity
-          - DomainName: https://z44usazbjk.execute-api.eu-west-1.amazonaws.com/development/api
-            Id: api
-            OriginPath: /development
-            CustomOriginConfig:
-              HTTPSPort: '443'
-              OriginProtocolPolicy: https-only
-        Enabled: 'true'
-        DefaultRootObject: index.html
-        Aliases:
-          - Ref: Domain
-        DefaultCacheBehavior:
-          AllowedMethods:
-            - DELETE
-            - GET
-            - HEAD
-            - OPTIONS
-            - PATCH
-            - POST
-            - PUT
-          TargetOriginId: vueApp
-          ViewerProtocolPolicy: redirect-to-https
-          CachePolicyId:
-            Ref: VueAppCachePolicy
-        CacheBehaviors:
-          - AllowedMethods:
-            - DELETE
-            - GET
-            - HEAD
-            - OPTIONS
-            - PATCH
-            - POST
-            - PUT
-            CachePolicyId:
-              Ref: APICachePolicy
-            PathPattern: api/*
-            TargetOriginId: api
-            ViewerProtocolPolicy: redirect-to-https
+      AlarmDescription: Too many errors on API Lambda
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 3
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions:
+        - !Ref CloudWatchAutoAlarmsSNSTopic
+#  TasksHostedZone:
+#    Type: AWS::Route53::HostedZone
+#    Properties:
+#      HostedZoneConfig:
+#        HostedZoneConfig
+#      Name:
+#        Ref: Domain
+#  CloudFrontOriginAccessIdentity:  # new
+#      Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+#      Properties:
+#        CloudFrontOriginAccessIdentityConfig:
+#          Comment: "Tasks UI"
+#  VueAppS3Policy:  # new
+#    Type: AWS::S3::BucketPolicy
+#    Properties:
+#      Bucket:
+#        Fn::ImportValue: s3-development-tasks-api-name
+#      PolicyDocument:
+#        Version: "2012-10-17"
+#        Statement:
+#          - Effect: Allow
+#            Principal:
+#              CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
+#            Action: "s3:GetObject"
+#            Resource:
+#              Fn::Join:
+#                - '/'
+#                - - Fn::ImportValue: s3-development-tasks-api-arn
+#                  - '*'
+#  APICachePolicy:  # new
+#    Type: AWS::CloudFront::CachePolicy
+#    Properties:
+#      CachePolicyConfig:
+#        DefaultTTL: 0
+#        MaxTTL: 1
+#        MinTTL: 0
+#        Name: APICachePolicy
+#        ParametersInCacheKeyAndForwardedToOrigin:
+#          CookiesConfig:
+#            CookieBehavior: all
+#          EnableAcceptEncodingGzip: true
+#          HeadersConfig:
+#            HeaderBehavior: whitelist
+#            Headers:
+#              - Authorization
+#              - Content-Type
+#          QueryStringsConfig:
+#            QueryStringBehavior: none
+#  VueAppCachePolicy:  # new
+#    Type: AWS::CloudFront::CachePolicy
+#    Properties:
+#      CachePolicyConfig:
+#        DefaultTTL: 30
+#        MaxTTL: 60
+#        MinTTL: 0
+#        Name: VueAppCachePolicy
+#        ParametersInCacheKeyAndForwardedToOrigin:
+#          CookiesConfig:
+#            CookieBehavior: all
+#          EnableAcceptEncodingGzip: true
+#          HeadersConfig:
+#            HeaderBehavior: whitelist
+#            Headers:
+#              - Content-Type
+#          QueryStringsConfig:
+#            QueryStringBehavior: none
+#  TasksCloudFront:  # new
+#    Type: AWS::CloudFront::Distribution
+#    Properties:
+#      DistributionConfig:
+#        Origins:
+#          - DomainName:
+#              Fn::Join:
+#                - '.'
+#                - - Fn::ImportValue: s3-development-tasks-api-name
+#                  - 's3.amazonaws.com'
+#            Id: vueApp
+#            S3OriginConfig:
+#              OriginAccessIdentity:
+#                  Fn::Join:
+#                      - ''
+#                      -
+#                        - 'origin-access-identity/cloudfront/'
+#                        - Ref: CloudFrontOriginAccessIdentity
+#          - DomainName: https://z44usazbjk.execute-api.eu-west-1.amazonaws.com/development/api
+#            Id: api
+#            OriginPath: /development
+#            CustomOriginConfig:
+#              HTTPSPort: '443'
+#              OriginProtocolPolicy: https-only
+#        Enabled: 'true'
+#        DefaultRootObject: index.html
+#        Aliases:
+#          - Ref: Domain
+#        DefaultCacheBehavior:
+#          AllowedMethods:
+#            - DELETE
+#            - GET
+#            - HEAD
+#            - OPTIONS
+#            - PATCH
+#            - POST
+#            - PUT
+#          TargetOriginId: vueApp
+#          ViewerProtocolPolicy: redirect-to-https
+#          CachePolicyId:
+#            Ref: VueAppCachePolicy
+#        CacheBehaviors:
+#          - AllowedMethods:
+#            - DELETE
+#            - GET
+#            - HEAD
+#            - OPTIONS
+#            - PATCH
+#            - POST
+#            - PUT
+#            CachePolicyId:
+#              Ref: APICachePolicy
+#            PathPattern: api/*
+#            TargetOriginId: api
+#            ViewerProtocolPolicy: redirect-to-https
 #        ViewerCertificate:
 #          AcmCertificateArn: <arn-of-https-certificate-you-created-in-previous-step>  # todo
 #          SslSupportMethod: sni-only
@@ -143,9 +191,9 @@ Resources:
 #      Name:
 #        Ref: Domain
 #      Type: A
-
-Outputs:
-  HostedZoneId:
-    Description: Hosted zone ID
-    Value:
-      Ref: TasksHostedZone
+#
+#Outputs:
+#  HostedZoneId:
+#    Description: Hosted zone ID
+#    Value:
+#      Ref: TasksHostedZone
